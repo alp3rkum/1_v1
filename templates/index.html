@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kişiselleştirilmiş Asistanınız</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .links{
+            text-align: center;
+        }
+        a
+        {
+            margin: 5px;
+            border-radius: 4px;
+            padding: 10px;
+            color: white;
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition-duration: 0.25s;
+        }
+        a:hover{
+            border: 1px solid white;
+        }
+        a:active{
+            background-color: #333;
+        }
+        main{
+            text-align: center;
+        }
+    </style>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> -->
+</head>
+<body> 
+    <main>
+        <h1>Kişiselleştirilmiş Asistan</h1>
+        <p>Yapay zeka destekli kişiselleştirilmiş asistanınız burada!</p>
+        <p class="links">
+            {% if userLogged == False %}
+                <a href="/login">Giriş Yap/Kaydol</a>
+            {% elif userLogged == True %}
+                <a href="/chat">Panele Git</a>
+            {% endif %}
+        </p>
+    </main>
+    
+    <!-- <script src="{{ url_for('static', filename='js/main.js') }}"></script> -->
+</body>
+</html>

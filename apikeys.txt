@@ -1,0 +1,10 @@
+netgsm_number=
+netgsm_password=
+mysql_host=localhost
+mysql_port=5432
+mysql_user=postgres
+mysql_password=12345
+mysql_database=db_pythongpt1
+smtp_email=
+smtp_key=
+param_key=

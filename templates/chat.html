@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Kişiselleştirilmiş Asistanınızla Konuşmanız</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://apis.google.com/js/api.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/rtf-parser/1.0.0/rtf-parser.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.26.2/docxtemplater.js"></script>
+        <script src="https://unpkg.com/pizzip@3.1.1/dist/pizzip.js"></script>
+        <script src="https://unpkg.com/pizzip@3.1.1/dist/pizzip-utils.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.4.0/pptxgen.min.js"></script> -->
+
+        <style>
+            html
+            {
+                font-family: Arial, sans-serif;
+            }
+            body
+            {
+                margin: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            header
+            {
+                background-color: #333;
+                color: #fff;
+                padding: 1rem;
+            }
+
+            .header-link
+            {
+                color: #ffffff;
+                text-decoration: none;
+                margin-right: 1rem;
+                transition-duration: 0.25s;
+            }
+
+            .header-link:hover
+            {
+                color: #ca9ec8;
+            }
+            .header-link:active
+            {
+                color: #976cb5;
+            }
+            .header-link.selected
+            {
+                color: #976cb5;
+            }
+            .header-link.selected:hover
+            {
+                color: #976cb5;
+            }
+            main
+            {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .title-container{
+                text-align: center;
+                color: white;
+            }
+            .chat-container{
+                background-color: white;
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                height: 80vh;
+                max-height: 640px;
+                overflow-y: scroll;
+                margin-bottom: 1rem;
+            }
+            input[type="text"], input[type="text"]:disabled{
+                background-color: white;
+                width: 100%;
+                align-self: left;
+                padding: 0.5rem;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                margin-bottom: 1rem;
+                box-sizing: border-box;
+            }
+
+            .container-small
+            {
+                width: 20%;
+                margin-right: 5%;
+            }
+
+            .container-big
+            {
+                width: 70%;
+            }
+            .ai-model-button
+            {
+                width: 100%;
+                background-color: transparent;
+                border: none;
+                padding: 0.5rem;
+                margin-bottom: 1rem;
+                cursor: pointer;
+                font-size: 20px;
+                transition-duration: 0.25s;
+            }
+            .ai-model-button:hover
+            {
+                color: #976cb5;
+            }
+            .ai-model-button:active
+            {
+                color: #ca9ec8;
+            }
+            .selected-model
+            {
+                color: #ca9ec8;
+            }
+            .selected-model:hover
+            {
+                color: #ca9ec8;
+            }
+            .chat-message {
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+            #microphone {
+                width: 4%;
+                background-color: transparent;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 20px;
+                margin-right: 1%;
+                transition-duration: 0.25s;
+                background-image: url('../static/microphone-3-32.png');
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            #microphone:hover {
+                border: 1px solid #fff;
+            }
+            #microphone:active {
+                background-color: #333;
+            }
+            #microphone.pressed {
+                border: 1px solid #fff;
+                background-color: #333;
+            }
+
+            #web {
+                width: 4%;
+                background-color: transparent;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 20px;
+                margin-right: 1%;
+                transition-duration: 0.25s;
+                background-image: url('../static/world-wide-web.png');
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            #web:hover {
+                border: 1px solid #fff;
+            }
+            #web:active {
+                background-color: #333;
+            }
+            #web.pressed {
+                border: 1px solid #fff;
+                background-color: #333;
+            }
+
+            #youtube {
+                width: 4%;
+                background-color: transparent;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 20px;
+                margin-right: 1%;
+                transition-duration: 0.25s;
+                background-image: url('../static/youtube-symbol.png');
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            #youtube:hover {
+                border: 1px solid #fff;
+            }
+            #youtube:active {
+                background-color: #333;
+            }
+            #youtube.pressed {
+                border: 1px solid #fff;
+                background-color: #333;
+            }
+
+            #upload {
+                width: 4%;
+                background-color: transparent;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 20px;
+                margin-right: 1%;
+                transition-duration: 0.25s;
+                background-image: url('../static/upload.png');
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            #upload:hover {
+                border: 1px solid #fff;
+            }
+            #upload:active {
+                background-color: #333;
+            }
+
+            #upload-folder {
+                width: 4%;
+                background-color: transparent;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 20px;
+                margin-right: 1%;
+                transition-duration: 0.25s;
+                background-image: url('../static/upload-folder.png');
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            #upload-folder:hover {
+                border: 1px solid #fff;
+            }
+            #upload-folder:active {
+                background-color: #333;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <nav>
+                <a class="header-link" href="{{ url_for('index') }}">Ana Sayfa</a>
+                <a class="header-link selected">Sohbet Botu</a>
+                <a class="header-link" href="{{ url_for('dashboard') }}">Kullanıcı Paneli</a>
+                <a class="header-link" href="{{ url_for('offers')}}">Token/Üyelik Planları</a>
+                <a class="header-link" href="{{ url_for('logout') }}">Çıkış Yap</a>
+            </nav>
+        </header>
+        <main>
+            <div class="container-small">
+                <div class="title-container">
+                    <h3>Modeller</h3>
+                    <div class="chat-container">
+                        <button class="ai-model-button" onclick="selectModel(0)" id="gemini-button">Gemini</button>
+                        <button class="ai-model-button" onclick="selectModel(1)" id="openai-button">OpenAI</button>
+                    </div>
+                </div>
+            </div>
+            <div class="container-big">
+                <div class="title-container">
+                    <h1>Kişiselleştirilmiş Asistanınızla Konuşmanız</h1>
+                    <h3>Kalan Token Sayınız: {{user.tokens_left}}</h3>
+                </div>
+                <div id="chat" class="chat-container">
+
+                </div>
+                <form id="typing-form">
+                    <button id="microphone" type="button"></button><button id="web" type="button"></button><button id="youtube" type="button"><button id="upload" type="button"></button><button id="upload-folder" type="button"></button>
+                    <!-- <br> -->
+                    <input type="text" id="message" placeholder="Mesajınız ('Enter'a basarak gönderebilirsiniz)" required> 
+                </form>
+            </div>
+        </main>
+        <script>
+            let selectedModelIndex = null;
+            let isRecording = false;
+            let isWebbing = false;
+            let isYoutubing = false;
+            let isUploading = false;
+            let isGoogled = false;
+            const password = '{{user.password}}';
+            if(password.length == 0)
+                isGoogled = true;
+
+            // let voiceCommunication = false;
+            const recognition = new webkitSpeechRecognition();
+            recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        console.log(transcript);
+                        voicePrompt(transcript);
+                    };
+            const inputElement = document.getElementById('message');
+            const chatContainer = document.getElementById('chat');
+            const microphoneButton = document.getElementById('microphone');
+            const webButton = document.getElementById('web');
+            const youtubeButton = document.getElementById('youtube');
+            const uploadButton = document.getElementById('upload');
+            const uploadFolderButton = document.getElementById('upload-folder');
+
+            function voicePrompt(transcript)
+            {
+                if (selectedModelIndex != null)
+                {
+                    const messageText = transcript;
+                    const messageElement = document.createElement('div');
+                    messageElement.innerHTML = `<span class="username"><b>{{ user.username }} (Sesli Komut)</b></span>: ${messageText}`;
+                    messageElement.className = 'chat-message';
+                    chatContainer.appendChild(messageElement);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/take-voice',
+                        data: {model_index: selectedModelIndex, message: transcript},
+                        success: function(response) {
+                            console.log(response);
+                            if (response.result === 'success')
+                            {
+                                const audioContent = response.audio;
+                                const audio = new Audio(`data:audio/mp3;base64,${audioContent}`);
+                                audio.play();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                                console.log(xhr.responseText);
+                        }
+                    });
+                }
+            }
+
+            function formatTime(seconds) {
+                let hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+                let mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                let secs = (seconds % 60).toFixed(2).toString().padStart(5, '0');
+
+                return `${hrs}:${mins}:${secs}`;
+            }
+
+            function selectModel(index) {
+            document.querySelectorAll('.ai-model-button').forEach(button => button.classList.remove('selected-model'));
+
+            document.querySelectorAll('.ai-model-button')[index].classList.add('selected-model');
+
+            // Assign the value to the selectedModel variable
+            selectedModelIndex = index;
+
+            console.log(`Selected model: ${selectedModelIndex}`);
+            }
+
+            microphoneButton.addEventListener('click', function() {
+                isRecording = !isRecording;
+                this.classList.toggle('pressed');
+                if(isRecording)
+                {
+                    inputElement.placeholder = "Sesli komutunuzu telaffuz ettikten sonra mikrofon tuşuna basarak kaydı kapatınız";
+                    inputElement.disabled = true;
+                    recognition.start();
+                }
+                else
+                {
+                    inputElement.placeholder = "Mesajınız ('Enter'a basarak gönderebilirsiniz)";
+                    inputElement.disabled = false;
+                    recognition.stop();
+                }
+            });
+
+            webButton.addEventListener('click', function() {
+               isWebbing = !isWebbing;
+               this.classList.toggle('pressed');
+               if(isWebbing)
+                {
+                    inputElement.placeholder = "Web'te aratacağınız kelime ('Enter'a basarak gönderebilirsiniz)";
+                }
+                else
+                {
+                    inputElement.placeholder = "Mesajınız ('Enter'a basarak gönderebilirsiniz)";
+                }
+            });
+
+            youtubeButton.addEventListener('click', function() {
+               isYoutubing = !isYoutubing;
+               this.classList.toggle('pressed');
+               if(isYoutubing)
+                {
+                    inputElement.placeholder = "Youtube'da transkriptini çıkarmak istediğiniz video linki ('Enter'a basarak gönderebilirsiniz)";
+                }
+                else
+                {
+                    inputElement.placeholder = "Mesajınız ('Enter'a basarak gönderebilirsiniz)";
+                }
+            });
+
+            uploadButton.addEventListener('click',function() {
+                if(selectedModelIndex == null)
+                {
+                    alert("Herhangi bir yapay zeka modeli seçmediniz.");
+                    return;
+                }
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.addEventListener('change',function() {
+                    const allowedExtensions = ['txt', 'rtf', 'docx', 'pdf']
+                    const file = fileInput.files[0];
+                    const fileExtension = file.name.toLowerCase().split('.').pop();
+                    console.log(fileExtension);
+                    if (!allowedExtensions.includes(fileExtension)) {
+                        alert('Bu türdeki dosyalar desteklenmiyor.');
+                        return;
+                    }
+                    const fileName = file.name;
+                    const reader = new FileReader();
+                    
+                    reader.addEventListener('load',async function() {
+                        let fileContents = reader.result;
+                        if (fileExtension === 'docx') {
+                            fileContents = await extractTextFromDocx(file);
+                        }
+                        if (fileExtension === 'pdf') {
+                            fileContents = await extractTextFromPdf(reader.result);
+                        }
+                        if (fileExtension === 'rtf') {
+                            fileContents = await extractTextFromRrtf(reader.result);
+                        }
+                        const messageText = fileName;
+                        const messageElement = document.createElement('div');
+                        messageElement.innerHTML = `<span class="username"><b>{{ user.username }} (Dosya Yükleme)</b></span>: ${messageText}`;
+                        messageElement.className = 'chat-message';
+                        chatContainer.appendChild(messageElement);
+                        console.log(fileContents);
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/upload-file',
+                            data: {file_name: fileName, file_content: fileContents, model_index: selectedModelIndex},
+                            success: function(response) {
+                                if(response.result === 'success')
+                                {
+                                    // console.log(response);
+                                    const responseText = response.response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n\n/g, '</p><p>');
+                                    const responseElement = document.createElement('div');
+                                    responseElement.innerHTML = `<span class="username"><b>Asistan</b></span>: ${responseText}`;
+                                    responseElement.className = 'chat-message';
+                                    chatContainer.appendChild(responseElement);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(xhr.responseText);
+                            }
+                        });
+                    });
+                    if(fileExtension != 'pdf' || fileExtension != 'rtf')
+                        reader.readAsText(file);
+                    else
+                        reader.readAsArrayBuffer(file);
+                });
+                fileInput.click();
+            });
+
+            uploadFolderButton.addEventListener('click',function() {
+                if(selectedModelIndex == null)
+                {
+                    alert("Herhangi bir yapay zeka modeli seçmediniz.");
+                    return;
+                }
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.webkitdirectory = true;
+                fileInput.multiple = true;
+
+                fileInput.addEventListener('change',async function() {
+                    const files = event.target.files;
+                    const fileNames = [];
+                    const fileContents = [];
+                    const filePaths = [];
+
+                    const readFile = (file) => {
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                if (file.name.endsWith('.pdf') || file.name.endsWith('.rtf')) {
+                                    resolve({ name: file.name, content: reader.result });
+                                } else {
+                                    resolve({ name: file.name, content: reader.result });
+                                }
+                            };
+                            reader.onerror = reject;
+                            if (file.name.endsWith('.pdf') || file.name.endsWith('.rtf')) {
+                                reader.readAsArrayBuffer(file); // PDF ve RTF dosyalarını ArrayBuffer olarak oku
+                            } else {
+                                reader.readAsText(file); // Diğer dosya türlerini metin olarak oku
+                            }
+                        });
+                    };
+
+                    const readAllFiles = async () => {
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            try {
+                                const fileContent = await readFile(file);
+                                fileNames.push(fileContent.name);
+                                filePaths.push(file.webkitRelativePath);
+                                if (file.name.endsWith('.pdf')) {
+                                    const text = await extractTextFromPdf(fileContent.content);
+                                    fileContents.push(text);
+                                } else if (file.name.endsWith('.rtf')) {
+                                    const text = extractTextFromRtf(fileContent.content);
+                                    fileContents.push(text);
+                                } else {
+                                    fileContents.push(fileContent.content);
+                                }
+                            } catch (error) {
+                                console.error(`Dosya okunamadı: ${file.name}`, error);
+                            }
+                        }
+                        console.log('Dosya isimleri:', fileNames);
+                        console.log('Dosya içerikleri:', fileContents);
+                        let totalContent = '';
+                        for(let i = 0; i < files.length; i++)
+                        {
+                            console.log(fileNames[i]);
+                            const fileExtension = fileNames[i].split('.').pop().toLowerCase();
+                            totalContent += fileContents[i];
+                            const messageText = filePaths[i];
+                            const messageElement = document.createElement('div');
+                            messageElement.innerHTML = `<span class="username"><b>{{ user.username }} (Dosya Yükleme)</b></span>: ${messageText}`;
+                            messageElement.className = 'chat-message';
+                            chatContainer.appendChild(messageElement);
+                            console.log(fileContents);
+                        }
+                        $.ajax({
+                            type: 'POST',
+                            url: '/upload-file',
+                            data: {file_name: '', file_content: totalContent, model_index: selectedModelIndex},
+                            success: function(response) {
+                                if(response.result === 'success')
+                                {
+                                    // console.log(response);
+                                    const responseText = response.response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n\n/g, '</p><p>');
+                                    const responseElement = document.createElement('div');
+                                    responseElement.innerHTML = `<span class="username"><b>Asistan</b></span>: ${responseText}`;
+                                    responseElement.className = 'chat-message';
+                                    chatContainer.appendChild(responseElement);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(xhr.responseText);
+                            }
+                        });
+                    };
+
+                    readAllFiles();
+                    
+                    
+
+                });
+
+                fileInput.click();
+            });
+
+            inputElement.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    if(isWebbing == false && isYoutubing == false)
+                    {
+                        console.log(`Mesajınız: ${inputElement.value}`);
+
+                        if (selectedModelIndex != null) {
+                        const messageText = inputElement.value;
+                        const messageElement = document.createElement('div');
+                        messageElement.innerHTML = `<span class="username"><b>{{ user.username }}</b></span>: ${messageText}`;
+                        messageElement.className = 'chat-message';
+                        chatContainer.appendChild(messageElement);
+                        
+                        $.ajax({
+                            type: 'POST',
+                            url: '/take-input',
+                            data: {model_index: selectedModelIndex, message: inputElement.value},
+                            success:function(response){
+                                if(response.result === 'success')
+                                {
+                                    const responseText = response.response.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n\n/g, '</p><p>');
+                                    const responseElement = document.createElement('div');
+                                    responseElement.innerHTML = `<span class="username"><b>Asistan</b></span>: ${responseText}`;
+                                    responseElement.className = 'chat-message';
+                                    chatContainer.appendChild(responseElement);
+                                    inputElement.value = '';
+                                }
+                                else if (response.result === 'error')
+                                {
+                                    alert(response.message);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(xhr.responseText);
+                            }
+                        })
+                        }
+                    }
+                    else if(isWebbing == true && isYoutubing == false)
+                    {
+                        console.log(`Anahtar kelimeniz: ${inputElement.value}`);
+                        isWebbing = false;
+                        webButton.classList.remove('pressed');
+                        inputElement.placeholder = "Mesajınız ('Enter'a basarak gönderebilirsiniz)";
+                        const messageText = `<i>Web Araması</i>: ${inputElement.value}`;
+                        const messageElement = document.createElement('div');
+                        messageElement.innerHTML = `<span class="username"><b>{{ user.username }}</b></span>: ${messageText}`;
+                        messageElement.className = 'chat-message';
+                        chatContainer.appendChild(messageElement);
+                        $.ajax({
+                            type: 'POST',
+                            url: '/search-input',
+                            data: {query: inputElement.value},
+                            success:function(response){
+                                const messageElement = document.createElement('div');
+                                messageElement.innerHTML = `<span class="username"><b>Arama Sonuçlarınız</b></span>:<br>`;
+                                messageElement.className = 'chat-message';
+                                response.forEach(result => {
+                                    messageElement.innerHTML += `<a href="${result.link}">${result.title}</a><br>`;
+                                });
+                                chatContainer.appendChild(messageElement);
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(xhr.responseText);
+                            }
+                        })
+                        inputElement.value = '';
+                    }
+                    else if(isYoutubing == true && isWebbing == false)
+                    {
+                        const videoID = inputElement.value.split('=')[1];
+                        console.log(`YouTube videonuz: ${inputElement.value}`);
+                        console.log(`YouTube ID: ${videoID}`);
+                        isYoutubing = false;
+                        webButton.classList.remove('pressed');
+                        inputElement.placeholder = "Mesajınız ('Enter'a basarak gönderebilirsiniz)";
+                        let messageText = `<i>YouTube Transkripti</i>: ${inputElement.value}`;
+                        const messageElement = document.createElement('div');
+                        messageElement.innerHTML = `<span class="username"><b>{{ user.username }}</b></span>: ${messageText}`;
+                        messageElement.className = 'chat-message';
+                        chatContainer.appendChild(messageElement);
+                        $.ajax({
+                            type: 'POST',
+                            url: '/transcript-tube',
+                            data: {video_id: videoID},
+                            success:function(response){
+                                console.log(response);
+                                let messageTitle = `<b>YouTube Videosunun Transkripti:</b><br>`;
+                                const messageElement = document.createElement('div');
+                                messageElement.className = 'chat-message';
+                                response.message.forEach(segment => {
+                                    console.log(segment.text);
+                                    messageTitle += `${formatTime(segment.start)}: ${segment.text}<br>`;
+                                });
+                                messageElement.innerHTML = messageTitle;
+                                chatContainer.appendChild(messageElement);
+                                inputElement.value = '';
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(xhr.responseText);
+                            }
+                        })
+                    }
+                }
+            });
+
+            async function extractTextFromDocx(file) {
+                const zip = new JSZip();
+                const content = await zip.loadAsync(file);
+                const xml = await content.file("word/document.xml").async("text");
+
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xml, "application/xml");
+
+                const paragraphs = xmlDoc.getElementsByTagName("w:t");
+                let text = "";
+                for (let i = 0; i < paragraphs.length; i++) {
+                    text += paragraphs[i].textContent + " ";
+                }
+
+                return text.trim();
+            }
+
+            async function extractTextFromPdf(arrayBuffer) {
+                const uint8Array = new Uint8Array(arrayBuffer);
+                console.log(uint8Array);
+                const pdf = await pdfjsLib.getDocument(uint8Array).promise;
+                let text = "";
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    textContent.items.forEach(item => {
+                        text += item.str + " ";
+                    });
+                }
+                console.log("PDF işleme tamamlandı.");
+                return text.trim();
+            }
+
+            async function extractTextFromRrtf(arrayBuffer) {
+                const decoder = new TextDecoder('utf-8');
+                const text = decoder.decode(arrayBuffer);
+                const rtfText = text.replace(/\\'3f/g, '?').replace(/\\par[d]?/g, '\n').replace(/\\[a-z]+[0-9]* ?/g, '').replace(/{|}/g, '');
+                return rtfText.trim();
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Kişiselleştirilmiş Asistan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition-duration: 0.25s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:active {
+            background-color: #3f9848;
+        }
+        .oauth-button {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .oauth-button:hover {
+            background-color: #357ae8;
+        }
+        .login-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+        #forgot-password {
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="login-container">
+            <div class="container">
+                <h1>Giriş Yap</h1>
+                <form id="login-form">
+                    <input type="email" id="login-email" placeholder="E-posta" required>
+                    <input type="password" id="login-password" placeholder="Şifre" required>
+                    <input type="tel" id="login-phone" placeholder="Telefon Numarası" required>
+                    <button type="button" id="forgot-password">Şifremi Unuttum</button>
+                    <button type="submit">Giriş Yap</button>
+                </form>
+                <!-- <button id="google-oauth" class="oauth-button">Google ile Giriş Yap</button> -->
+            </div>
+    
+            <div class="container">
+                <h1>Kayıt Ol</h1>
+                <form id="signup-form">
+                    <input type="text" id="username" placeholder="Kullanıcı Adı" required>
+                    <input type="email" id="email" placeholder="E-posta" required>
+                    <input type="password" id="password" placeholder="Şifre" required>
+                    <input type="text" id="phone" placeholder="Telefon Numarası" required>
+                    <button type="submit">Kayıt Ol</button>
+                </form>
+            </div>
+    
+            
+        </div>
+        <button id="google-oauth" class="oauth-button">Google ile Kayıt Ol/Giriş Yap</button>
+    </main>
+    
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Burada form verilerini backend'e gönderme işlemi yapılacak
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const phone = document.getElementById('login-phone').value;
+            console.log(email);
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({email,password})
+            })
+            .then(response => {
+                    if(response.redirected)
+                    {
+                        window.location.href = response.url;
+                    }
+                })
+                .catch(error => console.error(error));
+            
+            console.log('Form gönderildi');
+        })
+
+        document.getElementById('forgot-password').addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            const isValidEmail = emailRegex.test(email);
+            if(isValidEmail)
+            {
+                fetch('/remind-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({email})
+                })
+                .then(response => {
+                    if(response.ok)
+                    {
+                        alert("Şifre hatırlatma epostası gönderildi");
+                    }
+                })
+                
+            }
+            else
+            {
+                alert("Eposta alanına eposta adresinizi girerseniz şifre hatırlatma epostanızı alabilirsiniz.");
+            }
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Burada form verilerini backend'e gönderme işlemi yapılacak
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const phone = document.getElementById('phone').value;
+            console.log(username);
+            fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({username,email,password,phone})
+            })
+                .then(response => { console.log(response);
+                    if(response.redirected)
+                    {
+                        window.location.href = response.url;
+                    }
+                })
+                .catch(error => console.error(error));
+            
+            console.log('Form gönderildi');
+        });
+
+        document.getElementById('google-oauth').addEventListener('click', function() {
+            // Burada Google OAuth işlemi başlatılacak
+
+            fetch('/signup-google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+
+            console.log('Google OAuth başlatıldı');
+        });
+    </script>
+</body>
+</html>

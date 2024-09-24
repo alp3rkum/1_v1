@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Token ve Üyelik Paketleri</title>
+        <style>
+            html
+            {
+                font-family: Arial, sans-serif;
+            }
+            body
+            {
+                height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            header
+            {
+                background-color: #333;
+                color: #fff;
+                padding: 1rem;
+                margin-bottom: 0;
+            }
+
+            .header-link
+            {
+                color: #ffffff;
+                text-decoration: none;
+                margin-right: 1rem;
+                transition-duration: 0.25s;
+            }
+
+            .header-link:hover
+            {
+                color: #ca9ec8;
+            }
+            .header-link:active
+            {
+                color: #976cb5;
+            }
+            .header-link.selected
+            {
+                color: #976cb5;
+            }
+            .header-link.selected:hover
+            {
+                color: #976cb5;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <nav>
+                <a class="header-link" href="{{ url_for('index') }}">Ana Sayfa</a>
+                <a class="header-link" href="{{ url_for('chat_screen') }}">Sohbet Botu</a>
+                <a class="header-link" href="{{ url_for('dashboard') }}">Kullanıcı Paneli</a>
+                <a class="header-link selected">Token/Üyelik Planları</a>
+                <a class="header-link" href="{{ url_for('logout') }}">Çıkış Yap</a>
+            </nav>
+        </header>
+    </body>
+</html>

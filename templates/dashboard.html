@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Kullanıcı Paneli</title>
+        <style>
+            html
+            {
+                font-family: Arial, sans-serif;
+            }
+            body
+            {
+                height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            header
+            {
+                background-color: #333;
+                color: #fff;
+                padding: 1rem;
+                margin-bottom: 0;
+            }
+
+            .header-link
+            {
+                color: #ffffff;
+                text-decoration: none;
+                margin-right: 1rem;
+                transition-duration: 0.25s;
+            }
+
+            .header-link:hover
+            {
+                color: #ca9ec8;
+            }
+            .header-link:active
+            {
+                color: #976cb5;
+            }
+            .header-link.selected
+            {
+                color: #976cb5;
+            }
+            .header-link.selected:hover
+            {
+                color: #976cb5;
+            }
+            main
+            {
+                text-align: center;
+            }
+            .title-container
+            {
+                background-image: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.5) 100%);
+                padding-top: 1px;
+                padding-bottom: 1px;
+            }
+            .token-info{
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+            }
+            .info-div{
+                width: 40%;
+                background-color: rgba(255,255,255,0.5);
+                font-size: 18px;
+                padding: 10px;
+            }
+            .token-link
+            {
+                margin: 5px;
+                border-radius: 4px;
+                padding: 10px;
+                color: white;
+                text-decoration: none;
+                border: 1px solid transparent;
+                transition-duration: 0.25s;
+            }
+            .token-link:hover{
+                border: 1px solid white;
+            }
+            .token-link:active{
+                background-color: #333;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <nav>
+                <a class="header-link" href="{{ url_for('index') }}">Ana Sayfa</a>
+                <a class="header-link" href="{{ url_for('chat_screen') }}">Sohbet Botu</a>
+                <a class="header-link selected">Kullanıcı Paneli</a>
+                <a class="header-link" href="{{ url_for('offers')}}">Token/Üyelik Planları</a>
+                <a class="header-link" href="{{ url_for('logout') }}">Çıkış Yap</a>
+            </nav>
+        </header>
+        <main>
+            <div class="title-container">
+                <h1>Kullanıcı Paneli</h1>
+                <p>Merhaba, {{ user.username }}!</p>
+            </div>
+            <div class="token-info">
+                <div class="info-div">
+                    <p>Bu Ay Kalan Token: {{user.tokens_left}}</p>
+                    <a class="token-link" href="{{ url_for('offers')}}">Token Al</a>
+                </div>
+                <div class="info-div">
+                    <p>Üyelik Paketi: Ücretsiz</p>
+                    <a class="token-link" href="{{ url_for('offers')}}">Üyelik Paketlerini İncele</a>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
